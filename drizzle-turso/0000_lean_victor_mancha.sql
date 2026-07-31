@@ -29,7 +29,7 @@ CREATE TABLE `images` (
 	`thumbnail_sha` text NOT NULL,
 	`size` integer NOT NULL,
 	`type` text NOT NULL,
-	`category_id` integer,
+	`category_id` integer NOT NULL,
 	`create_date` integer NOT NULL,
 	`update_date` integer NOT NULL,
 	FOREIGN KEY (`category_id`) REFERENCES `images_category`(`id`) ON UPDATE no action ON DELETE no action
@@ -53,6 +53,10 @@ CREATE TABLE `user_session` (
 	`create_date` integer NOT NULL,
 	`expire_date` integer NOT NULL,
 	`revoked` integer DEFAULT false NOT NULL,
+	`device` text NOT NULL,
+	`ip` text NOT NULL,
+	`browser` text NOT NULL,
+	`os` text NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
