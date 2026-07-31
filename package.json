@@ -2,7 +2,7 @@
   "name": "NoteImageApi",
   "type": "module",
    "engines": {
-    "node": "v24.18.0"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
