@@ -1,0 +1,51 @@
+{
+  "name": "NoteImageApi",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:gen": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:mig": "drizzle-kit migrate",
+    "db:clear": "tsx src/db/init.ts clear",
+    "db:init": "tsx src/db/init.ts init",
+    "db:create": "tsx src/db/init.ts createImageUser"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1094.0",
+    "@hono/node-server": "^2.0.12",
+    "@hono/zod-openapi": "^1.5.1",
+    "@libsql/client": "^0.17.4",
+    "@octokit/webhooks": "^14.2.0",
+    "@scalar/hono-api-reference": "^0.11.11",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
+    "drizzle-zod": "^0.8.3",
+    "hono": "^4.12.32",
+    "lru-cache": "^11.5.2",
+    "sharp": "^0.35.3",
+    "ua-parser-js": "^2.0.10",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^2.0.1",
+    "@eslint/markdown": "^8.0.3",
+    "@types/node": "^26.1.1",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^10.8.0",
+    "globals": "^17.8.0",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.0",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.65.0",
+    "vitest": "^4.1.10"
+  }
+}
