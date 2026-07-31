@@ -1,6 +1,9 @@
 {
   "name": "NoteImageApi",
   "type": "module",
+   "engines": {
+    "node": "v24.18.0"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
@@ -23,7 +26,6 @@
     "@octokit/webhooks": "^14.2.0",
     "@scalar/hono-api-reference": "^0.11.11",
     "@types/bcrypt": "^6.0.0",
-    "@vercel/node": "^5.9.3",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
