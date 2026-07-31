@@ -3,7 +3,7 @@
   "regions": ["hkg1"],
   "functions": {
     "src/index.ts": {
-      "runtime": "@vercel/node@5",
+      "runtime": "@vercel/node@5.9.3",
       "memory": 1024,
       "maxDuration": 10
     }
