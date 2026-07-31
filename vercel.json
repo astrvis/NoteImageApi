@@ -1,9 +1,14 @@
 {
   "version": 2,
   "regions": ["hkg1"],
-  "builds": [{ "src": "src/index.ts", "use": "@vercel/node" }],
-
-  "routes": [
-    { "src": "/(.*)", "dest": "src/index.ts" }
+  "functions": {
+    "src/index.ts": {
+      "runtime": "@vercel/node@5",
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/src/index.ts" }
   ]
 }
