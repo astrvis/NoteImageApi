@@ -1,4 +1,3 @@
-import type { ServiceInputTypes, ServiceOutputTypes } from "@aws-sdk/client-s3"
 import {
   CopyObjectCommand,
   DeleteObjectCommand,
@@ -14,12 +13,7 @@ export const r2Client = new S3Client({
     accessKeyId: config.r2.accessKeyId,
     secretAccessKey: config.r2.secretAccessKey,
   },
-}) as S3Client & {
-  send<Input extends ServiceInputTypes, Output extends ServiceOutputTypes>(command: {
-    input: Input
-    constructor: new () => any
-  }): Promise<Output>
-}
+})
 
 /**
  * 上传文件到R2

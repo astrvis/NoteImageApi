@@ -5,9 +5,6 @@ import { emptyToUndefined } from "../utils/comm.js"
 
 export const imagesCategorySelectSchema = createSelectSchema(imagesCategory)
 
-// Zod v4 复合类型不继承 ZodType，运行时已注入 .openapi()，用断言绕过
-const $ = <T>(schema: T): T & { openapi(...args: unknown[]): T } => schema as any
-
 export const ImageCategoryRequestSchema = z.object({
   name: z.string().trim().nonempty("分类名称不能为空").describe("图片分类名称"),
 })
@@ -18,7 +15,7 @@ export const ImageCategoryAddResponseSchema = z.object({
 })
 
 export const ImageCategoryRequestParamsSchema = z.object({
-  id: $(z.coerce.number().int().positive().describe("图片分类id")),
+  id: z.coerce.number().int().positive().describe("图片分类id"),
 })
 export const ImageCategoryUpdateRequestBodySchema = z.object({
   name: z.string().trim().nonempty("分类名称不能为空").describe("图片分类名称"),
@@ -31,7 +28,7 @@ export const ImageCategoryDeleteResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
   list: z
     .object({
-      id: $(z.coerce.number().int().positive().describe("删除图片分类id")),
+      id: z.coerce.number().int().positive().describe("删除图片分类id"),
     })
     .describe("删除的图片分类"),
 })
@@ -45,10 +42,8 @@ export const ImageCategoryGetAllResponseSchema = z.object({
 })
 
 export const getImagesRequestQuerySchema = z.object({
-  page: $(
-    emptyToUndefined(
-      z.coerce.number({ message: "页码必须是整数且大于等于1" }).default(1),
-    ),
+  page: emptyToUndefined(
+    z.coerce.number({ message: "页码必须是整数且大于等于1" }).default(1),
   ).openapi({
     param: {
       name: "page",
@@ -58,10 +53,8 @@ export const getImagesRequestQuerySchema = z.object({
     default: 1,
   }),
 
-  pageSize: $(
-    emptyToUndefined(
-      z.coerce.number({ message: "每页数量必须是整数且大于等于1" }).default(20),
-    ),
+  pageSize: emptyToUndefined(
+    z.coerce.number({ message: "每页数量必须是整数且大于等于1" }).default(20),
   ).openapi({
     param: {
       name: "pageSize",

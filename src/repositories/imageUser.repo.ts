@@ -1,3 +1,4 @@
+import type { ResultSet } from "@libsql/client"
 import { and, desc, eq, inArray } from "drizzle-orm"
 import { db } from "../db/index.js"
 import {
@@ -9,8 +10,6 @@ import {
   type UsersSelect,
 } from "../db/schema.js"
 import type { DrizzleTx } from "./types.js"
-
-type ExecuteResult = { rowsAffected: number; rows: unknown[] }
 
 export const getDbImageUser = async (username: string): Promise<UsersSelect | undefined> => {
   const user = await db.query.users.findFirst({
@@ -56,7 +55,7 @@ export const getDbUserByIdFirst = async (
  * @param user 用户
  * @returns 插入结果
  */
-export const insertDbUser = async (user: UsersInsert, tx?: DrizzleTx): Promise<unknown> => {
+export const insertDbUser = async (user: UsersInsert, tx?: DrizzleTx): Promise<ResultSet> => {
   const DBTx = (tx ?? db) as typeof db
   return await DBTx.insert(users).values(user)
 }
@@ -69,7 +68,7 @@ export const insertDbUser = async (user: UsersInsert, tx?: DrizzleTx): Promise<u
 export const insertDbUserSession = async (
   session: UserSessionInsert,
   tx?: DrizzleTx,
-): Promise<unknown> => {
+): Promise<ResultSet> => {
   const DBTx = (tx ?? db) as typeof db
   return await DBTx.insert(userSession).values(session)
 }
@@ -99,7 +98,7 @@ export const getDbUserSessionFirst = async (
 export const deleteDbUserSessionSaveNewTen = async (
   userId: number,
   tx?: DrizzleTx,
-): Promise<ExecuteResult | unknown> => {
+): Promise<ResultSet> => {
   const DBTx = (tx ?? db) as typeof db
 
   const keepIds = await DBTx.select({ id: userSession.id })
@@ -119,7 +118,7 @@ export const deleteDbUserSessionSaveNewTen = async (
   const deleteIds = allSessions.filter((r) => !keepIdSet.has(r.id)).map((r) => r.id)
 
   if (deleteIds.length === 0) {
-    return { rowsAffected: 0, rows: [] } satisfies ExecuteResult
+    return { rows: [], columns: [], rowsAffected: 0 } as unknown as ResultSet
   }
 
   return await DBTx.delete(userSession).where(
