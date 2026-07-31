@@ -2,13 +2,13 @@
   "version": 2,
   "regions": ["hkg1"],
   "functions": {
-    "src/index.ts": {
+    "api/index.ts": {
       "runtime": "@vercel/node@5.9.3",
       "memory": 1024,
       "maxDuration": 10
     }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/src/index.ts" }
+    { "source": "/(.*)", "destination": "/api/index" }
   ]
 }
