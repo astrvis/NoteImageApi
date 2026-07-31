@@ -5,8 +5,8 @@ export const createAdminRoute = <T extends RouteConfig>(config: T) => {
     ...config,
     security: [
       {
-        bearerAuth: [],
+        bearerAuth: [] as string[],
       },
     ],
-  })
+  } as Parameters<typeof createRoute>[0])
 }

@@ -1,0 +1,10 @@
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { addImage, deleteImage, getAllImages, getImageById, updateImage, } from "../controllers/images.controller.js";
+import { addImageRoute, deleteImageRoute, getAllImagesRoute, getImageByIdRoute, updateImageRoute, } from "./definition/images.definition.js";
+export const adminIimagesRoutes = new OpenAPIHono();
+export const publicImagesRoutes = new OpenAPIHono();
+adminIimagesRoutes.openapi(addImageRoute, addImage);
+adminIimagesRoutes.openapi(deleteImageRoute, deleteImage);
+adminIimagesRoutes.openapi(updateImageRoute, updateImage);
+publicImagesRoutes.openapi(getAllImagesRoute, getAllImages);
+publicImagesRoutes.openapi(getImageByIdRoute, getImageById);
