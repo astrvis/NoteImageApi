@@ -4,7 +4,6 @@ import { config } from "../config.js"
 import type { ImageDataRequset } from "../controllers/images.controller.js"
 import { AppError } from "../errors/app-error.js"
 import { addDbImage, getDbImageBySha } from "../repositories/images.repo.js"
-import { imageCache } from "../utils/lruCache.js"
 import { deleteFromR2, uploadToR2 } from "./r2.js"
 
 export const addImageService = async (data: ImageDataRequset) => {
@@ -39,7 +38,7 @@ export const addImageService = async (data: ImageDataRequset) => {
     await uploadToR2(thumbBuffer, thumbnailPath, config.r2.thumbnailType as string)
 
     const result = await addDbImage(formData)
-    imageCache.set(result.id, result)
+
     return {
       success: true,
       list: result,
