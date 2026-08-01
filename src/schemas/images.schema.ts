@@ -89,7 +89,18 @@ export const getImagesResponseSchema = z.object({
   pageSize: z.number().describe("每页数量"),
 })
 
-export const getImageByIdParamsSchema = ImageDeleteRequestParamsSchema
+export const getImageByIdParamsSchema = z.object({
+  sha: z
+    .string("图片SHA不能为空")
+    .trim()
+    .openapi({
+      param: {
+        name: "sha",
+        in: "path",
+      },
+      description: "图片SHA",
+    }),
+})
 export const getImageByIdResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
   list: ImageSchema.describe("图片列表"),

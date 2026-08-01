@@ -22,7 +22,7 @@ export const imagesCache = createLRU<string, DbResultType<ImagesSelect>>({
   updateAgeOnGet: true,
 })
 
-export const imageCache = createLRU<number, ImagesSelect>({
+export const imageCache = createLRU<string, ImagesSelect>({
   max: 100,
   ttl: 1000 * 60 * 5,
   updateAgeOnGet: true,

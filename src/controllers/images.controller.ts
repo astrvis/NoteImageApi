@@ -5,6 +5,7 @@ import { getDbImageCategoryById } from "../repositories/images.categories.repo.j
 import {
   deleteDbImage,
   getDbImageById,
+  getDbImageBySha,
   getDbImages,
   updateDbImage,
 } from "../repositories/images.repo.js"
@@ -14,7 +15,7 @@ import type {
   addImageRoute,
   deleteImageRoute,
   getAllImagesRoute,
-  getImageByIdRoute,
+  getImageByShaRoute,
   updateImageRoute,
 } from "../routes/definition/images.definition.js"
 import { addImageService } from "../service/images.service.js"
@@ -45,7 +46,7 @@ export const addImage: RouteHandler<typeof addImageRoute> = async (c) => {
     category,
   }
   const result = await addImageService(data)
-
+  imageCache.set(result.list.sha, result.list)
   return c.json(result)
 }
 
@@ -58,7 +59,7 @@ export const deleteImage: RouteHandler<typeof deleteImageRoute> = async (c) => {
     await deleteFromR2(image.path)
     await deleteFromR2(image.thumbnailPath)
     const result = await deleteDbImage(id)
-    imageCache.delete(Number(id))
+    imageCache.delete(image.sha)
     return c.json({
       success: true,
       list: result,
@@ -74,7 +75,6 @@ export const deleteImage: RouteHandler<typeof deleteImageRoute> = async (c) => {
 
 export const updateImage: RouteHandler<typeof updateImageRoute> = async (c) => {
   const { id } = c.req.valid("param")
-  imageCache.delete(Number(id))
 
   const { name, categoryId } = c.req.valid("json")
   const category = await getDbImageCategoryById(categoryId)
@@ -138,7 +138,8 @@ export const updateImage: RouteHandler<typeof updateImageRoute> = async (c) => {
     } catch (e) {
       console.error("删除旧缩略图失败", e)
     }
-    imageCache.set(result.id, result)
+    imageCache.delete(image.sha)
+    imageCache.set(result.sha, result)
     return c.json({
       success: true,
       list: result,
@@ -175,18 +176,18 @@ export const getAllImages: RouteHandler<typeof getAllImagesRoute> = async (c) =>
   })
 }
 
-export const getImageById: RouteHandler<typeof getImageByIdRoute> = async (c) => {
-  const { id } = c.req.valid("param")
-  const lruResult = imageCache.get(Number(id))
+export const getImageBySha: RouteHandler<typeof getImageByShaRoute> = async (c) => {
+  const { sha } = c.req.valid("param")
+  const lruResult = imageCache.get(sha)
   if (lruResult)
     return c.json({
       success: true,
       list: lruResult,
     })
 
-  const image = await getDbImageById(id)
+  const image = await getDbImageBySha(sha)
   if (!image) throw new AppError(404, "图片不存在")
-  imageCache.set(Number(id), image)
+  imageCache.set(sha, image)
   return c.json({
     success: true,
     list: image,

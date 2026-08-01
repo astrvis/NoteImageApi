@@ -102,9 +102,9 @@ export const getAllImagesRoute = createRoute({
     },
   },
 })
-export const getImageByIdRoute = createRoute({
+export const getImageByShaRoute = createRoute({
   method: "get",
-  path: "/images/{id}",
+  path: "/images/{sha}",
   tags: ["图片"],
   request: {
     params: getImageByIdParamsSchema,

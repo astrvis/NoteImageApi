@@ -3,7 +3,7 @@ import {
   addImage,
   deleteImage,
   getAllImages,
-  getImageById,
+  getImageBySha,
   updateImage,
 } from "../controllers/images.controller.js"
 
@@ -11,7 +11,7 @@ import {
   addImageRoute,
   deleteImageRoute,
   getAllImagesRoute,
-  getImageByIdRoute,
+  getImageByShaRoute,
   updateImageRoute,
 } from "./definition/images.definition.js"
 
@@ -22,4 +22,4 @@ adminIimagesRoutes.openapi(addImageRoute, addImage)
 adminIimagesRoutes.openapi(deleteImageRoute, deleteImage)
 adminIimagesRoutes.openapi(updateImageRoute, updateImage)
 publicImagesRoutes.openapi(getAllImagesRoute, getAllImages)
-publicImagesRoutes.openapi(getImageByIdRoute, getImageById)
+publicImagesRoutes.openapi(getImageByShaRoute, getImageBySha)
