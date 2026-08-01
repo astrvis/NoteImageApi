@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.1094.0
+        specifier: ^3.1096.0
         version: 3.1096.0
       '@hono/node-server':
         specifier: ^2.0.12
@@ -81,9 +81,6 @@ importers:
       nodemon:
         specifier: ^3.1.14
         version: 3.1.14
-      pnpm:
-        specifier: ^10.33.0
-        version: 10.34.5
       prettier:
         specifier: ^3.9.6
         version: 3.9.6
@@ -2006,11 +2003,6 @@ packages:
   picomatch@4.0.5:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
-
-  pnpm@10.34.5:
-    resolution: {integrity: sha512-pO4F8vc2WCVb1qiYWcBlpFwopX2u+uLIk6Fo7itzFow3uR6D5X6mdlStA/AwMXRkMOi84442LgQmBfuKvIAZLg==}
-    engines: {node: '>=18.12'}
-    hasBin: true
 
   postcss@8.5.23:
     resolution: {integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg==}
@@ -4181,8 +4173,6 @@ snapshots:
   picomatch@2.3.2: {}
 
   picomatch@4.0.5: {}
-
-  pnpm@10.34.5: {}
 
   postcss@8.5.23:
     dependencies:

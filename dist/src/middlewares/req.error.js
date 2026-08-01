@@ -1,4 +1,4 @@
-
+import { ZodError } from "zod";
 import { AppError } from "../errors/app-error.js";
 /**
  * 处理错误
