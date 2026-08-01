@@ -1,4 +1,4 @@
-import { count, desc, eq, getTableColumns } from "drizzle-orm"
+import { count, desc, eq, getTableColumns, or } from "drizzle-orm"
 import { db } from "../db/index.js"
 import { images, type ImagesInsert, type ImagesSelect } from "../db/schema.js"
 import type { DrizzleTx } from "./types.js"
@@ -61,7 +61,7 @@ export const getDbImageBySha = async (
 ): Promise<ImagesSelect | undefined> => {
   const DBTx = (tx ?? db) as typeof db
   const list = await DBTx.query.images.findFirst({
-    where: eq(images.sha, sha),
+    where: or(eq(images.sha, sha), eq(images.thumbnailSha, sha)),
   })
   return list
 }
