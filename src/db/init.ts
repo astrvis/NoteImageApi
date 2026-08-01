@@ -1,11 +1,14 @@
 import bcrypt from "bcrypt"
 import crypto from "crypto"
-import { eq, sql } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { existsSync, readdirSync, readFileSync, statSync } from "fs"
-import { basename, join, relative } from "path"
+import { basename, extname, join, relative } from "path"
 import { config } from "../config.js"
+import type { ImageDataRequset } from "../controllers/images.controller.js"
+import { getOrAddDbImageCategory } from "../repositories/images.categories.repo.js"
+import { addImageService } from "../service/images.service.js"
 import { db } from "./index.js"
-import { articles, categories, users, userSession } from "./schema.js"
+import { articles, categories, users } from "./schema.js"
 
 export interface NoteFile {
   sha: string
@@ -13,8 +16,6 @@ export interface NoteFile {
   name: string
   content: string
 }
-
-export const NOTE_DIR = "/mnt/d/astvis/my-development/web/Note"
 
 /**
  * 计算 git blob 的 SHA-1 值
@@ -53,14 +54,14 @@ const getAllFiles = (dir: string): string[] => {
  * 获取 Note 目录中所有文件（排除 readme.md）
  * @returns Note 文件列表
  */
-export const getNoteFiles = (): NoteFile[] =>
-  getAllFiles(NOTE_DIR)
+export const getNoteFiles = (DIR: string): NoteFile[] =>
+  getAllFiles(DIR)
     .filter((fullPath) => basename(fullPath).toLowerCase() !== "readme.md")
     .map((fullPath) => {
       const content = readFileSync(fullPath, "utf-8")
       return {
         sha: calcGitBlobSha(content),
-        path: relative(NOTE_DIR, fullPath).replace(/\\/g, "/"),
+        path: relative(DIR, fullPath).replace(/\\/g, "/"),
         name: basename(fullPath).replace(/\.md$/, ""),
         content,
       }
@@ -72,7 +73,7 @@ export const getNoteFiles = (): NoteFile[] =>
  * @returns Note 文件内容
  */
 export const readNoteFile = (relativePath: string): NoteFile | null => {
-  const fullPath = join(NOTE_DIR, relativePath)
+  const fullPath = join(relativePath)
   if (!existsSync(fullPath)) return null
   const content = readFileSync(fullPath, "utf-8")
   return {
@@ -163,13 +164,12 @@ export const clearTables = async () => {
   // 顺序不能改：先子表 articles，再主表 categories
   // await db.delete(articles)
   // await db.delete(categories)
-
   // 重置自增id
   // await db.run(sql`DELETE FROM sqlite_sequence WHERE name='articles'`)
   // await db.run(sql`DELETE FROM sqlite_sequence WHERE name='categories'`)
-  await db.delete(userSession)
-  await db.run(sql`DELETE FROM sqlite_sequence WHERE name='userSession'`)
-  console.log("✅ 数据表清空完成")
+  // await db.delete(userSession)
+  // await db.run(sql`DELETE FROM sqlite_sequence WHERE name='userSession'`)
+  // console.log("✅ 数据表清空完成")
 }
 
 const createUser = async (username: string, password: string = "123456") => {
@@ -190,7 +190,106 @@ const createUser = async (username: string, password: string = "123456") => {
     .run()
   console.log(`✅ 用户创建完成 ${username}Password: ${password}`)
 }
+/**
+ * 从字符串中提取数字前缀
+ * @param str 输入字符串
+ * @returns   loading_1718 → loading
+              凌华_荧_17181617 → 凌华_荧
+ */
+function extractPrefix(str: string): string {
+  const parts = str.split("_")
+  const resultParts: string[] = []
 
+  for (const part of parts) {
+    // 判断当前片段是不是纯数字
+    const isAllNum = /^\d+$/.test(part)
+    if (isAllNum) break
+    resultParts.push(part)
+  }
+  return resultParts.join("_")
+}
+type ImagesFile = {
+  categoryName: string
+  name: string
+  size: number
+  type: string
+  buffer: Buffer
+}
+export const getImagesFiles = (DIR: string): ImagesFile[] => {
+  const imageExts = new Set([
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".webp",
+    ".avif",
+    ".svg",
+    ".ico", // 图标
+    ".bmp", // 位图
+  ])
+  const imageMimeMap: Record<string, string> = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+    ".avif": "image/avif",
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon",
+    ".bmp": "image/bmp",
+    ".apng": "image/png",
+  }
+
+  const data = getAllFiles(DIR)
+    .filter((fullPath) => basename(fullPath).toLowerCase() !== "readme.md")
+    .filter((fullPath) => imageExts.has(extname(fullPath).toLowerCase()))
+    .filter((fullPath) => relative(DIR, fullPath).replace(/\\/g, "/").split("/").length === 2)
+    .map((fullPath) => {
+      const buf = readFileSync(fullPath)
+      const path = relative(DIR, fullPath).replace(/\\/g, "/")
+      const categoryName = path.split("/")[0]
+      const name = extractPrefix(path.split("/")[1])
+      return {
+        categoryName,
+        name,
+        size: statSync(fullPath).size,
+        type: imageMimeMap[extname(fullPath).toLowerCase()],
+        buffer: buf,
+      }
+    })
+  return data
+}
+
+const insertImages = async () => {
+  const imagesDir = "/mnt/d/astvis/my-development/images-bed/images"
+  const imageFiles = getImagesFiles(imagesDir)
+  console.log(imageFiles.length)
+  // console.log(imageFiles)
+  let i = 0
+
+  for (const image of imageFiles) {
+    try {
+      const category = await getOrAddDbImageCategory(image.categoryName)
+      const data: ImageDataRequset = {
+        name: image.name,
+        image: {
+          size: image.size,
+          type: image.type,
+        },
+        imageData: image.buffer,
+        category,
+      }
+      console.log(`开始导入第${i}张图片 ${image.categoryName}/${image.name}`)
+      await addImageService(data)
+      console.log(`✅导入第${i}张图片 ${image.categoryName}/${image.name}成功`)
+    } catch (error) {
+      console.error(`❌导入第${i}张图片 ${image.categoryName}/${image.name}失败 `, error)
+    }
+    i++
+    // 延时保留
+    await new Promise((resolve) => setTimeout(resolve, 100))
+  }
+}
 if (import.meta.main) {
   const cmd = process.argv[2]
   switch (cmd) {
@@ -198,13 +297,17 @@ if (import.meta.main) {
       await clearTables()
       break
     case "init":
-      const files = getNoteFiles()
+      const NOTE_DIR = "/mnt/d/astvis/my-development/web/Note"
+      const files = getNoteFiles(NOTE_DIR)
       await initDatabase(files)
       break
     case "createImageUser":
       const username = process.argv[3] || "admin"
       const password = process.argv[4] || "123456"
       await createUser(username, password)
+      break
+    case "initImages":
+      await insertImages()
       break
   }
 }

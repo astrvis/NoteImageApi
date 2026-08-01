@@ -17,7 +17,8 @@
     "db:mig": "drizzle-kit migrate",
     "db:clear": "tsx src/db/init.ts clear",
     "db:init": "tsx src/db/init.ts init",
-    "db:create": "tsx src/db/init.ts createImageUser"
+    "db:create": "tsx src/db/init.ts createImageUser",
+    "db:img": "tsx src/db/init.ts initImages"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1096.0",

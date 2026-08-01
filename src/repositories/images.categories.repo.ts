@@ -1,6 +1,11 @@
 import { count, desc, eq, getTableColumns } from "drizzle-orm"
 import { db } from "../db/index.js"
-import { images, imagesCategory, type ImagesCategoriesInsert } from "../db/schema.js"
+import {
+  images,
+  imagesCategory,
+  type ImagesCategoriesInsert,
+  type ImagesCategoriesSelect,
+} from "../db/schema.js"
 import type { DrizzleTx } from "./types.js"
 
 export const addDbImageCategory = async (formData: ImagesCategoriesInsert, tx?: DrizzleTx) => {
@@ -78,4 +83,23 @@ export const getDbAllImagesByCategoryId = async (
     DBTx.select({ count: count() }).from(images).where(eq(images.categoryId, categoryId)),
   ])
   return { list, total: total[0].count }
+}
+
+export const getOrAddDbImageCategory = async (
+  categoryName: string,
+  tx?: DrizzleTx,
+): Promise<ImagesCategoriesSelect> => {
+  const DBTx = (tx ?? db) as typeof db
+  const imagesCategoryResult = await DBTx.query.imagesCategory.findFirst({
+    where: eq(imagesCategory.name, categoryName),
+  })
+  if (imagesCategoryResult) return imagesCategoryResult
+  const [result] = await DBTx.insert(imagesCategory)
+    .values({
+      name: categoryName,
+      createDate: Date.now(),
+      updateDate: Date.now(),
+    })
+    .returning()
+  return result
 }

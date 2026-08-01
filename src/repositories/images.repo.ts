@@ -10,6 +10,7 @@ export const addDbImage = async (formData: ImagesInsert, tx?: DrizzleTx): Promis
     .returning({
       ...getTableColumns(images),
     })
+    .onConflictDoNothing()
 
   return list
 }

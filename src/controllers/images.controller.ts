@@ -1,18 +1,15 @@
 import type { RouteHandler } from "@hono/zod-openapi"
-import { createHash } from "crypto"
-import sharp from "sharp"
 import { config } from "../config.js"
 import { AppError } from "../errors/app-error.js"
 import { getDbImageCategoryById } from "../repositories/images.categories.repo.js"
 import {
-  addDbImage,
   deleteDbImage,
   getDbImageById,
-  getDbImageBySha,
   getDbImages,
   updateDbImage,
 } from "../repositories/images.repo.js"
 
+import type { ImagesCategoriesSelect } from "../db/schema.js"
 import type {
   addImageRoute,
   deleteImageRoute,
@@ -20,59 +17,36 @@ import type {
   getImageByIdRoute,
   updateImageRoute,
 } from "../routes/definition/images.definition.js"
-import { copyToR2, deleteFromR2, uploadToR2 } from "../service/r2.js"
+import { addImageService } from "../service/images.service.js"
+import { copyToR2, deleteFromR2 } from "../service/r2.js"
 import { imageCache, imagesCache } from "../utils/lruCache.js"
+export type ImageDataRequset = {
+  name: string
+  image: {
+    type: string
+    size: number
+  }
+  imageData: Buffer
+  category: ImagesCategoriesSelect
+}
 export const addImage: RouteHandler<typeof addImageRoute> = async (c) => {
   const { name, categoryId, image } = c.req.valid("form")
-
   const category = await getDbImageCategoryById(categoryId)
   if (!category) throw new AppError(404, "图片分类不存在")
-
   const buffer = await image.arrayBuffer()
   const imageData = Buffer.from(buffer)
-
-  const sha = createHash("sha256").update(imageData).digest("hex")
-  const path = `${config.r2.image}/${category.name}/${sha}.${image.type.split("/")[1]}`
-  const thumbBuffer = await sharp(imageData)
-    .resize({ width: 400, height: 400, fit: "inside" })
-    .rotate()
-    .toFormat(config.r2.thumbnailType, { quality: 75 })
-    .toBuffer()
-  const thumbnailSha = createHash("sha256").update(thumbBuffer).digest("hex")
-  const thumbnailPath = `${config.r2.thumbnail}/${category.name}/${thumbnailSha}.${config.r2.thumbnailType}`
-  const formData = {
-    name: name,
-    categoryId: categoryId,
-    sha: sha,
-    thumbnailSha: thumbnailSha,
-    path: path,
-    thumbnailPath: thumbnailPath,
-    size: image.size / 1024 / 1024,
-    type: image.type,
-    createDate: Date.now(),
-    updateDate: Date.now(),
+  const data: ImageDataRequset = {
+    name,
+    image: {
+      type: image.type,
+      size: image.size,
+    },
+    imageData,
+    category,
   }
-  try {
-    const existingImage = await getDbImageBySha(sha)
-    if (existingImage) throw new AppError(409, "图片已存在")
+  const result = await addImageService(data)
 
-    await uploadToR2(imageData, path, image.type)
-    await uploadToR2(thumbBuffer, thumbnailPath, config.r2.thumbnailType as string)
-
-    const result = await addDbImage(formData)
-    imageCache.set(result.id, result)
-    return c.json({
-      success: true,
-      list: result,
-    })
-  } catch (err) {
-    if (err instanceof AppError) {
-      throw err
-    }
-    await deleteFromR2(path)
-    await deleteFromR2(thumbnailPath)
-    throw new AppError(500, "上传图片失败")
-  }
+  return c.json(result)
 }
 
 export const deleteImage: RouteHandler<typeof deleteImageRoute> = async (c) => {
