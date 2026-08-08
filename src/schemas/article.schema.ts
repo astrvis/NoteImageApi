@@ -36,12 +36,16 @@ export const ArticleQuerySchema = z.object({
 export const ArticleSchema = createSelectSchema(articles)
 export const ArticlesResponseSchema = z.object({
   success: z.boolean(),
-  total: z.number(),
-  list: z.array(ArticleSchema),
-  page: z.number(),
-  pageSize: z.number(),
+  message: z.string(),
+  data: z.object({
+    list: z.array(ArticleSchema),
+    total: z.number(),
+    page: z.number(),
+    pageSize: z.number(),
+  }),
 })
 export const ArticleResponseSchema = z.object({
   success: z.boolean(),
-  list: ArticleSchema,
+  message: z.string(),
+  data: ArticleSchema,
 })

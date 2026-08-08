@@ -41,7 +41,8 @@ export const addImageService = async (data: ImageDataRequset) => {
 
     return {
       success: true,
-      list: result,
+      message: "添加成功",
+      data: result,
     }
   } catch (err) {
     console.error(err)

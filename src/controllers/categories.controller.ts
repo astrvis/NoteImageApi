@@ -12,20 +12,16 @@ export const getAllCategories: RouteHandler<typeof getCategoriesRoute> = async (
   if (result)
     return c.json({
       success: true,
-      list: result.list,
-      total: result.total,
-      page,
-      pageSize: pageSize,
+      message: "获取成功",
+      data: { total: result.total, list: result.list, page, pageSize },
     })
 
   const { list, total } = await getDbAllCategories(page, pageSize)
   articlesCategoriesCache.set(`${page}_${pageSize}`, { list, total })
   return c.json({
     success: true,
-    list,
-    total,
-    page,
-    pageSize,
+    message: "获取成功",
+    data: { list, total, page, pageSize },
   })
 }
 
@@ -38,18 +34,14 @@ export const getArticleByCategoriesId: RouteHandler<typeof getArticleByCategorie
   if (result)
     return c.json({
       success: true,
-      list: result.list,
-      total: result.total,
-      page,
-      pageSize,
+      message: "获取成功",
+      data: { list: result.list, total: result.total, page, pageSize },
     })
   const { list, total } = await getDbArticleByCategoriesId(Number(id), page, pageSize)
   articlesCache.set(`${id}_${page}_${pageSize}`, { list, total })
   return c.json({
     success: true,
-    list,
-    total,
-    page,
-    pageSize,
+    message: "获取成功",
+    data: { list, total, page, pageSize },
   })
 }

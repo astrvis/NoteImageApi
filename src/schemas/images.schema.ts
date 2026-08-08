@@ -32,12 +32,12 @@ export const ImageRequestBodySchema = z.object({
 })
 export const ImageAddResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
-  list: ImageSchema.describe("图片列表"),
+  data: ImageSchema.describe("图片列表"),
 })
 
 export const ImageDeleteResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
-  list: z.object({
+  data: z.object({
     id: z.number().describe("图片ID"),
   }),
 })
@@ -83,10 +83,13 @@ export const getImagesRequestQuerySchema = z.object({
 
 export const getImagesResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
-  list: ImageSchema.array().describe("图片列表"),
-  total: z.number().describe("总数量"),
-  page: z.number().describe("当前页码"),
-  pageSize: z.number().describe("每页数量"),
+  message: z.string().describe("操作结果"),
+  data: {
+    list: ImageSchema.array().describe("图片列表"),
+    total: z.number().describe("总数量"),
+    page: z.number().describe("当前页码"),
+    pageSize: z.number().describe("每页数量"),
+  },
 })
 
 export const getImageByIdParamsSchema = z.object({
@@ -103,5 +106,5 @@ export const getImageByIdParamsSchema = z.object({
 })
 export const getImageByIdResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
-  list: ImageSchema.describe("图片列表"),
+  data: ImageSchema.describe("图片列表"),
 })

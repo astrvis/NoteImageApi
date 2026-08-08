@@ -7,14 +7,21 @@ export const CategorySchema = createSelectSchema(categories)
 
 export const categoriesResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
-  list: z.array(CategorySchema).describe("分类列表"),
-  total: z.coerce.number().int().positive().describe("总分类数"),
-  page: z.coerce.number().int().positive().describe("页码"),
-  pageSize: z.coerce.number().int().positive().describe("每页数量"),
+  message: z.string().describe("操作结果"),
+  data: z.object({
+    total: z.coerce.number().int().positive().describe("总分类数"),
+    list: z.array(CategorySchema).describe("分类列表"),
+    page: z.coerce.number().int().positive().describe("页码"),
+    pageSize: z.coerce.number().int().positive().describe("每页数量"),
+  }),
 })
 export const categoryResponseSchema = categoriesResponseSchema.extend({
   success: z.boolean().describe("是否成功"),
-  list: z.array(ArticleSchema).describe("文章列表"),
+  message: z.string().describe("操作结果"),
+  data: z.object({
+    total: z.coerce.number().int().positive().describe("总分类数"),
+    list: z.array(ArticleSchema).describe("文章列表"),
+  }),
 })
 export const categoriesQuerySchema = z.object({
   page: emptyToUndefined(

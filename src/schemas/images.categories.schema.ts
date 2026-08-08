@@ -11,7 +11,7 @@ export const ImageCategoryRequestSchema = z.object({
 
 export const ImageCategoryAddResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
-  list: imagesCategorySelectSchema.describe("添加的图片分类"),
+  data: imagesCategorySelectSchema.describe("添加的图片分类"),
 })
 
 export const ImageCategoryRequestParamsSchema = z.object({
@@ -22,11 +22,11 @@ export const ImageCategoryUpdateRequestBodySchema = z.object({
 })
 export const ImageCategoryUpdateResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
-  list: imagesCategorySelectSchema.describe("更新的图片分类"),
+  data: imagesCategorySelectSchema.describe("更新的图片分类"),
 })
 export const ImageCategoryDeleteResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
-  list: z
+  data: z
     .object({
       id: z.coerce.number().int().positive().describe("删除图片分类id"),
     })
@@ -35,10 +35,13 @@ export const ImageCategoryDeleteResponseSchema = z.object({
 
 export const ImageCategoryGetAllResponseSchema = z.object({
   success: z.boolean().describe("是否成功"),
-  list: z.array(imagesCategorySelectSchema).describe("所有图片分类"),
-  total: z.number().describe("总数量"),
-  page: z.number().describe("页码"),
-  pageSize: z.number().describe("每页数量"),
+  message: z.string().describe("操作结果"),
+  data: z.object({
+    list: z.array(imagesCategorySelectSchema).describe("所有图片分类"),
+    total: z.number().describe("总数量"),
+    page: z.number().describe("页码"),
+    pageSize: z.number().describe("每页数量"),
+  }),
 })
 
 export const getImagesRequestQuerySchema = z.object({

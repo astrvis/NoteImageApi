@@ -28,7 +28,8 @@ export const addImageCategory: RouteHandler<typeof addImageCategoryRoute> = asyn
 
   return c.json({
     success: true,
-    list: {
+    message: "添加成功",
+    data: {
       id: result.id,
       name,
       createDate: Date.now(),
@@ -49,7 +50,8 @@ export const updateImageCategoryById: RouteHandler<typeof updateImageCategoryRou
   if (!result) throw new AppError(404, "图片分类不存在")
   return c.json({
     success: true,
-    list: result,
+    message: "更新成功",
+    data: result,
   })
 }
 
@@ -59,7 +61,8 @@ export const deleteImageCategoryById: RouteHandler<typeof deleteImageCategoryRou
   if (!result) throw new AppError(404, "图片分类不存在")
   return c.json({
     success: true,
-    list: result,
+    message: "删除成功",
+    data: result,
   })
 }
 
@@ -69,19 +72,25 @@ export const getAllImageCategory: RouteHandler<typeof getAllImageCategoryRoute> 
   if (lruResult)
     return c.json({
       success: true,
-      list: lruResult.list,
-      total: lruResult.total,
-      page,
-      pageSize,
+      message: "获取成功",
+      data: {
+        list: lruResult.list,
+        total: lruResult.total,
+        page,
+        pageSize,
+      },
     })
   const { list, total } = await getDbAllImageCategory(page, pageSize)
   imagesCategoriesCache.set(`${page}_${pageSize}`, { list, total })
   return c.json({
     success: true,
-    list,
-    total,
-    page,
-    pageSize,
+    message: "获取成功",
+    data: {
+      list,
+      total,
+      page,
+      pageSize,
+    },
   })
 }
 
@@ -92,19 +101,25 @@ export const getImageCategoryById: RouteHandler<typeof getImageCategoryByIdRoute
   if (lruResult)
     return c.json({
       success: true,
-      list: lruResult.list,
-      total: lruResult.total,
-      page,
-      pageSize,
+      message: "获取成功",
+      data: {
+        list: lruResult.list,
+        total: lruResult.total,
+        page,
+        pageSize,
+      },
     })
   const result = await getDbAllImagesByCategoryId(id, page, pageSize)
   if (!result) throw new AppError(404, "图片分类不存在")
   imagesCache.set(`${id}_${page}_${pageSize}`, result)
   return c.json({
     success: true,
-    list: result.list,
-    total: result.total,
-    page,
-    pageSize,
+    message: "获取成功",
+    data: {
+      list: result.list,
+      total: result.total,
+      page,
+      pageSize,
+    },
   })
 }

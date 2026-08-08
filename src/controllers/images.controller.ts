@@ -46,7 +46,7 @@ export const addImage: RouteHandler<typeof addImageRoute> = async (c) => {
     category,
   }
   const result = await addImageService(data)
-  imageCache.set(result.list.sha, result.list)
+  imageCache.set(result.data.sha, result.data)
   return c.json(result)
 }
 
@@ -62,7 +62,8 @@ export const deleteImage: RouteHandler<typeof deleteImageRoute> = async (c) => {
     imageCache.delete(image.sha)
     return c.json({
       success: true,
-      list: result,
+      message: "删除成功",
+      data: result,
     })
   } catch (err) {
     if (err instanceof AppError) {
@@ -142,7 +143,8 @@ export const updateImage: RouteHandler<typeof updateImageRoute> = async (c) => {
     imageCache.set(result.sha, result)
     return c.json({
       success: true,
-      list: result,
+      message: "更新成功",
+      data: result,
     })
   } catch (err) {
     if (err instanceof AppError) {
@@ -160,19 +162,25 @@ export const getAllImages: RouteHandler<typeof getAllImagesRoute> = async (c) =>
   if (lruResult)
     return c.json({
       success: true,
-      list: lruResult.list,
-      total: lruResult.total,
-      page,
-      pageSize: pageSize,
+      message: "获取成功",
+      data: {
+        list: lruResult.list,
+        total: lruResult.total,
+        page,
+        pageSize: pageSize,
+      },
     })
   const { list, total } = await getDbImages(page, pageSize)
   imagesCache.set(`${page}_${pageSize}`, { list, total })
   return c.json({
     success: true,
-    list,
-    total,
-    page,
-    pageSize,
+    message: "获取成功",
+    data: {
+      list,
+      total,
+      page,
+      pageSize,
+    },
   })
 }
 
@@ -182,7 +190,8 @@ export const getImageBySha: RouteHandler<typeof getImageByShaRoute> = async (c) 
   if (lruResult)
     return c.json({
       success: true,
-      list: lruResult,
+      message: "获取成功",
+      data: lruResult,
     })
 
   const image = await getDbImageBySha(sha)
@@ -190,6 +199,7 @@ export const getImageBySha: RouteHandler<typeof getImageByShaRoute> = async (c) 
   imageCache.set(sha, image)
   return c.json({
     success: true,
-    list: image,
+    message: "获取成功",
+    data: image,
   })
 }
