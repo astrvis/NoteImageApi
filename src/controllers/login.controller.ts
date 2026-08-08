@@ -65,8 +65,8 @@ export const login: RouteHandler<typeof LoginRoute> = async (c) => {
   return c.json({
     success: true,
     message: "登录成功",
-    accessToken,
-    user: {
+    data: {
+      accessToken,
       id: user.id,
       username: user.username,
     },
@@ -142,8 +142,8 @@ export const refreshToken: RouteHandler<typeof refreshTokenRoute> = async (c) =>
   return c.json({
     success: true,
     message: "刷新成功",
-    accessToken,
-    user: {
+    data: {
+      accessToken,
       id: user.id,
       username: user.username,
     },
